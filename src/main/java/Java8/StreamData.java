@@ -15,10 +15,14 @@ public class StreamData {
 
         List<Person> persons = getPersonListDemo();
         Stream<Person> stream = persons.stream();
-        sortStream();
+
+        flatMapStream2();
+//        flatMapStream();
+//        skipStream();
+//        limitStream();
+//        sortStream();
 //        distinctStream();
 //        mapStream();
-//
 //        filterStream();
 //        createMapStream();
 //        createStream();
@@ -26,6 +30,42 @@ public class StreamData {
 
 
     }
+
+
+
+    //取出陣列裡面的陣列所有值，並且把陣列取出來的值都一起塞到另一個stream裡面。
+    private static void flatMapStream2() {
+
+        List<Person> persons = getPersonListDemo();
+        persons.stream().flatMap(person -> person.getBook().stream())
+                        .flatMap(book -> Arrays.stream(book.getCategory().split(",")))
+                        .distinct().forEach(s -> System.out.println(s));
+
+
+
+    }
+    private static void flatMapStream() {
+        List<Person> persons = getPersonListDemo();
+        persons.stream()
+                .flatMap(person -> person.getBook().stream())
+                .distinct()
+                .forEach(o -> System.out.println(o.getName()));
+
+    }
+
+    //skip跳過元素，比較特別是第一個就是1，而不是0
+    private static void skipStream() {
+        List<Person> persons =getPersonListDemo();
+        persons.stream().distinct().sorted((person,p1)->(p1.getAge()-person.getAge())).skip(2).forEach(
+                person -> System.out.println(person.getName()+"==="+person.getAge())
+        );
+    }
+    //limit取得多少筆資料 Ex:2筆就是兩個
+    private static void limitStream() {
+        List<Person> persons = getPersonListDemo();
+        persons.stream().distinct().sorted((person, t1) -> t1.getAge() - person.getAge()).limit(1).forEach(person -> System.out.println(person.getName()+"="+person.getAge()));
+    }
+
     /*
      如果是用空參的sorted()方法的話，要在Bean裡面 implements Comparable<T> 才能使用，不然會出現無法轉換成Comparable類的錯誤
 
@@ -79,7 +119,7 @@ public class StreamData {
         map.put("leo", 20);
         map.put("tim", 25);
 
-//      Entry泛型就是把map裡面的key:value封裝起來
+//      Entry泛型就是把map裡面的各個物件用key:value封裝起來形成一個集合
 //      Stream流的元素都是entry的類型
         Set<Map.Entry<String, Integer>> entries = map.entrySet();
         Stream<Map.Entry<String, Integer>> stream = entries.stream();
@@ -105,13 +145,13 @@ public class StreamData {
         Book book1 = new Book();
         book1.setId(1L);
         book1.setName("Java Programming");
-        book1.setCategory("Programming");
+        book1.setCategory("Science");
         book1.setScore(4);
 
         Book book2 = new Book();
         book2.setId(2L);
         book2.setName("Introduction to Algorithms");
-        book2.setCategory("Computer Science");
+        book2.setCategory("Fiction");
         book2.setScore(5);
 
         Book book3 = new Book();
@@ -125,6 +165,8 @@ public class StreamData {
         book4.setName("Principles of Physics");
         book4.setCategory("Science");
         book4.setScore(5);
+
+
 
         // 创建 Person 实例并设置书籍列表
         List<Book> books = new ArrayList<>();
