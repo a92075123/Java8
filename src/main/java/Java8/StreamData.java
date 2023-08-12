@@ -4,11 +4,17 @@ import Bean.Book;
 import Bean.Person;
 
 import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+
+/**
+ * 當下的stream使用過(結束操作)一次後，就不能再重複使用了
+ */
 public class StreamData {
 
     public static void main(String[] args) {
@@ -16,7 +22,15 @@ public class StreamData {
         List<Person> persons = getPersonListDemo();
         Stream<Person> stream = persons.stream();
 
-        flatMapStream2();
+        reduceStream();
+//        findFirstStream();
+//        findAnyStream();
+//        noneMatchStream();
+//        allMatchStream();
+//        anyMatchStream();
+//        collectStream();
+//        countStream();
+//        flatMapStream2();
 //        flatMapStream();
 //        skipStream();
 //        limitStream();
@@ -31,6 +45,97 @@ public class StreamData {
 
     }
 
+    private static void reduceStream() {
+
+        /*
+        reduce對初始值(identity)做業務邏輯，integer就是初始值，integer2陣列中的每一個元素
+        每取一次就元素就會與integer值做業務邏輯，以下面為範例就是一直相加，每取得到一個元素
+        integer就會跟integer2相加，並且回傳新的integer，在和下一個新的integer2元素相加，所以數字會越來越大
+        */
+        List<Person> persons = getPersonListDemo();
+        Integer reduce = persons.stream().map(person -> person.getAge())
+                .reduce(10, (integer, integer2) -> integer + integer2);
+
+        Integer reduceAgeMin = persons.stream().map(person -> person.getAge())
+                .reduce(Integer.MAX_VALUE, (integer, integer2) -> integer > integer2 ? integer2 : integer);
+
+
+        /*
+        這裡只有對reduce只傳一個值，但跟傳兩個值是一樣的，差在兩個參數是我們自己手動設定初始值，另一個一個參數他是把
+        陣列裡的元素第一個值自動當作初始值
+         */
+        Optional<Integer> reduceAgeMax = persons.stream().map(person -> person.getAge()).reduce((integer, integer2) -> integer>integer2?integer:integer2);
+        reduceAgeMax.ifPresent(integer -> System.out.println(integer));
+    }
+
+
+    //取得第一個項目
+    private static void findFirstStream() {
+        List<Person> persons = getPersonListDemo();
+
+        Optional<Person> first = persons.stream().sorted((o1, o2) -> o1.getAge() - o2.getAge()).findFirst();
+        first.ifPresent(person -> System.out.println(person));
+
+    }
+
+    //任意獲得一個達成條件的值 Optional拿來處理空值或NULL
+    private static void findAnyStream() {
+        List<Person> persons = getPersonListDemo();
+        Optional<Person> any = persons.stream().filter(person -> person.getAge()>10).findAny();
+
+        any.ifPresent(person -> System.out.println(person.getName()));
+    }
+
+    //判斷條件，只要全部都不達成條件就是true，要不然有一個達成就是false
+    private static void noneMatchStream() {
+        List<Person> persons = getPersonListDemo();
+        boolean b = persons.stream().noneMatch(person -> person.getAge() > 50);
+        System.out.println(b);
+    }
+
+    //判斷條件，只要有一個沒有達成就返回false不然全部符合就返回true
+    private static void allMatchStream() {
+        List<Person> persons = getPersonListDemo();
+        boolean b = persons.stream().allMatch(person -> person.getAge() > 10);
+        System.out.println(b);
+    }
+
+    //判斷條件，只要有一個達成就返回true不然就false
+    private static void anyMatchStream() {
+        List<Person> persons = getPersonListDemo();
+        boolean b = persons.stream().anyMatch(person -> person.getAge() > 50);
+        System.out.println(b);
+    }
+
+    private static void collectStream() {
+        List<Person> persons = getPersonListDemo();
+        //轉換List集合
+        List<String> personsList = persons.stream()
+                .map(person -> person.getName())
+                .collect(Collectors.toList());
+
+        //轉換set集合
+        Set<Book> bookSet = persons.stream().flatMap(person -> person.getBook().stream())
+                .collect(Collectors.toSet());
+
+        /*轉換map集合
+            分別要new 兩個方法，一個是key一個是value，下面舉例get.Name是key，getBook是value
+         */
+        Map<String,List<Book>> collect;
+        collect = persons.stream()
+                .distinct()
+                .collect(Collectors.toMap(person -> person.getName(), person -> person.getBook()));
+    }
+
+    private static void countStream() {
+        List<Person> persons = getPersonListDemo();
+        long count = persons.stream()
+                        .flatMap(person -> person.getBook()
+                        .stream())
+                        .distinct()
+                        .count();
+        System.out.println(count);
+    }
 
 
     //取出陣列裡面的陣列所有值，並且把陣列取出來的值都一起塞到另一個stream裡面。

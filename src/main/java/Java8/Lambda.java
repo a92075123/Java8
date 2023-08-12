@@ -15,6 +15,10 @@ import java.util.function.IntPredicate;
 public class Lambda {
     public static void main(String[] args) {
 
+
+
+
+
 //        new Thread(()->{System.out.println("1");}).start();
 
 //        int i = calculateNum((i12, i1) -> i12 + i1);
