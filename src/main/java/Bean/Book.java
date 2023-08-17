@@ -14,6 +14,19 @@ public class Book {
 
     private Integer score;
 
+    public Book() {
+
+    }
+
+    public Book(Long id, String name, String category, Integer score) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.score = score;
+    }
+
+
+
     public Long getId() {
         return id;
     }

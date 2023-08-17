@@ -4,9 +4,6 @@ import Bean.Book;
 import Bean.Person;
 
 import java.util.*;
-import java.util.function.BinaryOperator;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -14,6 +11,8 @@ import java.util.stream.Stream;
 
 /**
  * 當下的stream使用過(結束操作)一次後，就不能再重複使用了
+ * 如果要再使用的話，就在創造新的stream
+ * EX:persons.stream
  */
 public class StreamData {
 
@@ -22,7 +21,12 @@ public class StreamData {
         List<Person> persons = getPersonListDemo();
         Stream<Person> stream = persons.stream();
 
-        reduceStream();
+
+
+
+        negateStream();
+//         andStream();
+//        reduceStream();
 //        findFirstStream();
 //        findAnyStream();
 //        noneMatchStream();
@@ -41,6 +45,22 @@ public class StreamData {
 //        createMapStream();
 //        createStream();
 //        test01(persons);
+
+
+    }
+    /*
+    .negate取相反的結果，下面為例，下面要取大於25的人，但因為有.negate所以相反，所以取得到小於25的人
+     */
+    private static void negateStream() {
+        List<Person> persons = getPersonListDemo();
+        persons.stream().filter(((Predicate<Person>) person -> person.getAge() > 25).negate()).forEach(person -> System.out.println(person.getName()+person.getAge()));
+
+
+    }
+
+    private static void andStream() {
+        List<Person> persons = getPersonListDemo();
+        persons.stream().filter(((Predicate<Person>) person -> person.getAge() > 26).and(person -> person.getName().length()>1)).forEach(person -> System.out.println(person.getName()));
 
 
     }
